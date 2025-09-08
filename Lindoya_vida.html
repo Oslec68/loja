@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Estruturada Lindoya → OXXO</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f4f8, #f0f8ff);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .titulo {
+            display: none;
+        }
+        
+        .mapa {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            background: #c8e6c9;
+            background-image: 
+                linear-gradient(0deg, rgba(255,255,255,0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px),
+                linear-gradient(45deg, rgba(255,255,255,0.2) 2px, transparent 2px),
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 30%),
+                radial-gradient(circle at 75% 75%, rgba(200,230,200,0.3) 0%, transparent 25%);
+            background-size: 60px 60px, 60px 60px, 40px 40px, 200px 200px, 150px 150px;
+            padding-top: 60px;
+        }
+        
+        .fonte {
+            position: absolute;
+            top: 3%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #3b82f6, #1e40af);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 0 20px #3b82f6;
+            z-index: 50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        .fonte-label {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #3b82f6;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        
+        .centro-distribuicao {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: radial-gradient(circle, #22d3ee, #0891b2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 0 15px #22d3ee;
+            z-index: 40;
+        }
+        
+        .linha-principal {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #22d3ee, #06b6d4);
+            background-size: 25px 100%;
+            animation: agua-principal 1.5s linear infinite;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 1);
+            z-index: 15;
+            border-radius: 3px;
+        }
+        
+        @keyframes agua-principal {
+            0% { background-position: 0 0; }
+            100% { background-position: 25px 0; }
+        }
+        
+        .linha-secundaria {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #22d3ee, #06b6d4, #0891b2);
+            background-size: 15px 100%;
+            animation: agua-fluindo 2s linear infinite;
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
+            z-index: 20;
+            border-radius: 2px;
+        }
+        
+        @keyframes agua-fluindo {
+            0% { background-position: 0 0; }
+            100% { background-position: 15px 0; }
+        }
+        
+        .oxxo-loja {
+            position: absolute;
+            width: 8px;
+            height: 12px;
+            background: #dc2626;
+            transform: rotate(45deg);
+            border-radius: 50% 50% 50% 0;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.6);
+            cursor: pointer;
+            z-index: 30;
+            animation: loja-pulse 3s ease-in-out infinite;
+        }
+        
+        .oxxo-loja:hover {
+            transform: rotate(45deg) scale(1.5);
+        }
+        
+        .oxxo-loja::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+        
+        @keyframes loja-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .regiao-label {
+            position: absolute;
+            color: #2c3e50;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: 3px 6px;
+            border-radius: 8px;
+            z-index: 35;
+            border: 1px solid #bdc3c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .info {
+            display: none;
+        }
+        
+        .contador {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 6px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            z-index: 100;
+            text-align: center;
+            border: 1px solid #3b82f6;
+            min-width: 60px;
+        }
+        
+        .botao {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="titulo">REDE ESTRUTURADA LINDOYA VIDA × OXXO - 603 LOJAS</div>
+    
+    <div class="mapa" id="mapa">
+        <div class="fonte" id="fonte">
+            <div class="fonte-label">LINDOIA VIDA</div>
+            💧
+        </div>
+        
+        <!-- CENTRO DE DISTRIBUIÇÃO CAJAMAR -->
+        <div class="centro-distribuicao" style="position: absolute; top: 25%; left: 40%; z-index: 45;">
+            <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 6px; color: #0891b2; font-weight: bold;">CAJAMAR CD</div>
+            🏭
+        </div>
+        
+        <div class="regiao-label" style="top: 25%; left: 58%;">ZONA NORTE</div>
+        <div class="regiao-label" style="top: 45%; left: 58%;">CENTRO</div>
+        <div class="regiao-label" style="top: 70%; left: 52%;">ZONA SUL</div>
+        <div class="regiao-label" style="top: 40%; left: 88%;">ZONA LESTE</div>
+        <div class="regiao-label" style="top: 40%; left: 12%;">ZONA OESTE</div>
+        <div class="regiao-label" style="top: 80%; left: 72%;">ABC</div>
+        <div class="regiao-label" style="top: 10%; left: 38%;">CAMPINAS</div>
+        <div class="regiao-label" style="top: 20%; left: 12%;">JUNDIAÍ</div>
+        <div class="regiao-label" style="top: 15%; left: 42%;">VALINHOS</div>
+        <div class="regiao-label" style="top: 50%; left: 5%;">SOROCABA</div>
+        <div class="regiao-label" style="top: 92%; left: 45%;">BAIXADA SANTISTA</div>   
+    </div>
+    
+    <div class="info">
+        <div><strong>🏔️ FONTE:</strong> Lindoia</div>
+        <div><strong>🔄 CENTROS:</strong> 6 Regiões</div>
+        <div><strong>🏪 LOJAS:</strong> 603 OXXO</div>
+        <div><strong>💧 PRODUTO:</strong> Água 1L</div>
+    </div>
+    
+    <div class="contador">
+        <div style="font-size: 16px; color: #22c55e;"><span id="total">0</span></div>
+        <div style="font-size: 9px;">LOJAS CONECTADAS</div>
+        <div style="font-size: 8px; margin-top: 2px;">de 603 total</div>
+    </div>
+    
+    <button class="botao" onclick="criarRede(); this.style.display='none';">🚀 CONSTRUIR REDE</button>
+    
+    <script>
+        let contador = 0;
+        let redeAtiva = false;
+        
+        function criarLinha(x1, y1, x2, y2, tipo = 'secundaria') {
+            const linha = document.createElement('div');
+            linha.className = tipo === 'principal' ? 'linha-principal' : 'linha-secundaria';
+            
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const comprimento = Math.sqrt(dx*dx + dy*dy);
+            const angulo = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            linha.style.width = comprimento + 'px';
+            linha.style.left = x1 + 'px';
+            linha.style.top = y1 + 'px';
+            linha.style.transform = `rotate(${angulo}deg)`;
+            linha.style.transformOrigin = '0 center';
+            
+            return linha;
+        }
+        
+        function criarCentroDistribuicao(x, y, regiao) {
+            const centro = document.createElement('div');
+            centro.className = 'centro-distribuicao';
+            centro.style.left = x + 'px';
+            centro.style.top = y + 'px';
+            centro.textContent = '🏢';
+            centro.title = `Centro - ${regiao}`;
+            return centro;
+        }
+        
+        function criarLoja(x, y) {
+            const loja = document.createElement('div');
+            loja.className = 'oxxo-loja';
+            loja.style.left = x + '%';
+            loja.style.top = y + '%';
+            return loja;
+        }
+        
+        function criarRede() {
+            if (redeAtiva) return;
+            redeAtiva = true;
+            
+            const mapa = document.getElementById('mapa');
+            
+            const antigas = mapa.querySelectorAll('.linha-principal, .linha-secundaria, .oxxo-loja, .centro-distribuicao');
+            antigas.forEach(el => el.remove());
+            contador = 0;
+            document.getElementById('total').textContent = '0';
+            
+            const fonteX = window.innerWidth * 0.5;
+            const fonteY = window.innerHeight * 0.12;
+            
+            // Centro de Distribuição Cajamar (ÚNICO)
+            const cajamarX = window.innerWidth * 0.4;
+            const cajamarY = window.innerHeight * 0.25;
+            
+            // Criar linha principal: Fonte → Cajamar
+            setTimeout(() => {
+                const linhaPrincipalCajamar = criarLinha(fonteX, fonteY, cajamarX + 20, cajamarY + 20, 'principal');
+                mapa.appendChild(linhaPrincipalCajamar);
+                
+                // Criar centro Cajamar
+                const centroEl = criarCentroDistribuicao(cajamarX, cajamarY, 'Cajamar CD');
+                centroEl.textContent = '🏭';
+                centroEl.style.width = '50px';
+                centroEl.style.height = '50px';
+                centroEl.style.fontSize = '20px';
+                mapa.appendChild(centroEl);
+            }, 500);
+            
+            // Todas as lojas distribuídas por região (TOTAL: 603)
+            const regioes = [
+                { nome: 'Centro SP', lojas: 135, area: { x: 45, y: 45, w: 20, h: 20 } },
+                { nome: 'Zona Norte', lojas: 105, area: { x: 45, y: 25, w: 20, h: 15 } },
+                { nome: 'Zona Leste', lojas: 90, area: { x: 70, y: 40, w: 25, h: 25 } },
+                { nome: 'Zona Oeste', lojas: 80, area: { x: 15, y: 40, w: 25, h: 25 } },
+                { nome: 'Zona Sul', lojas: 70, area: { x: 40, y: 70, w: 20, h: 20 } },
+                { nome: 'ABC', lojas: 60, area: { x: 60, y: 80, w: 25, h: 15 } },
+                { nome: 'Campinas', lojas: 28, area: { x: 25, y: 10, w: 15, h: 15 } },
+                { nome: 'Baixada Santista', lojas: 15, area: { x: 50, y: 90, w: 20, h: 8 } },
+                { nome: 'Jundiaí', lojas: 8, area: { x: 20, y: 20, w: 10, h: 10 } },
+                { nome: 'Sorocaba', lojas: 10, area: { x: 10, y: 50, w: 12, h: 12 } },
+                { nome: 'Valinhos', lojas: 2, area: { x: 30, y: 15, w: 8, h: 8 } }
+            ];
+            
+            // Criar todas as lojas conectadas DIRETAMENTE ao Cajamar
+            let delay = 1000;
+            regioes.forEach(regiao => {
+                for (let i = 0; i < regiao.lojas; i++) {
+                    setTimeout(() => {
+                        // Posição aleatória dentro da área da região
+                        const lojaX = regiao.area.x + Math.random() * regiao.area.w;
+                        const lojaY = regiao.area.y + Math.random() * regiao.area.h;
+                        
+                        const lojaXFinal = Math.max(2, Math.min(98, lojaX));
+                        const lojaYFinal = Math.max(15, Math.min(95, lojaY));
+                        
+                        // Criar loja
+                        const loja = criarLoja(lojaXFinal, lojaYFinal);
+                        mapa.appendChild(loja);
+                        
+                        // Linha DIRETA do Cajamar para cada loja
+                        const lojaXPixel = (lojaXFinal / 100) * window.innerWidth;
+                        const lojaYPixel = (lojaYFinal / 100) * window.innerHeight;
+                        
+                        const linhaDistribuicao = criarLinha(
+                            cajamarX + 25, 
+                            cajamarY + 25, 
+                            lojaXPixel + 4, 
+                            lojaYPixel + 6, 
+                            'secundaria'
+                        );
+                        mapa.appendChild(linhaDistribuicao);
+                        
+                        contador++;
+                        document.getElementById('total').textContent = contador;
+                        
+                    }, delay);
+                    delay += 15;
+                }
+            });
+        }
+        
+        function criarLojasRegiao(centro, mapa) {
+            const raio = 100;
+            
+            for (let i = 0; i < centro.lojas; i++) {
+                setTimeout(() => {
+                    const angulo = (i / centro.lojas) * 2 * Math.PI + (Math.random() - 0.5) * 0.8;
+                    const distancia = raio * (0.2 + Math.random() * 0.8);
+                    
+                    const lojaX = centro.x + Math.cos(angulo) * distancia;
+                    const lojaY = centro.y + Math.sin(angulo) * distancia;
+                    
+                    const lojaXPercent = Math.max(1, Math.min(99, (lojaX / window.innerWidth) * 100));
+                    const lojaYPercent = Math.max(15, Math.min(95, (lojaY / window.innerHeight) * 100));
+                    
+                    const loja = criarLoja(lojaXPercent, lojaYPercent);
+                    mapa.appendChild(loja);
+                    
+                    const lojaXPixel = (lojaXPercent / 100) * window.innerWidth;
+                    const lojaYPixel = (lojaYPercent / 100) * window.innerHeight;
+                    
+                    const linhaAgua = criarLinha(
+                        centro.x + 20, 
+                        centro.y + 20, 
+                        lojaXPixel + 4, 
+                        lojaYPixel + 6, 
+                        'secundaria'
+                    );
+                    mapa.appendChild(linhaAgua);
+                    
+                    contador++;
+                    document.getElementById('total').textContent = contador;
+                    
+                }, i * 25);
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            // Iniciar a primeira rede após 1 segundo
+            setTimeout(criarRede, 1000);
+            
+            // Loop automático a cada 30 segundos
+            setInterval(() => {
+                redeAtiva = false; // Resetar para permitir nova criação
+                criarRede();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
